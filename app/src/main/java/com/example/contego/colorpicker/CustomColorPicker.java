@@ -30,8 +30,9 @@ public class CustomColorPicker extends HorizontalScrollView {
             mColorBoxes[i] = colorBox;
 
             float sum = 16 + 17 * 0.25F;
-            colorBox.setBackgroundColor(Color.HSVToColor(new float[]{
-                    (1.25F * (1 + i) - 0.5F) * 360 / sum, 1, 1}));
+            float hue = (1.25F * (1 + i) - 0.5F) * 360 / sum;
+
+            colorBox.setBackgroundColor(Color.HSVToColor(new float[]{hue, 1, 1}));
 
             colorBox.setOnClickListener(new OnClickListener() {
                 @Override

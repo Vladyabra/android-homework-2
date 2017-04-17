@@ -1,13 +1,17 @@
 package com.example.contego.colorpicker;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-    private final String TEXT_COLOR_KEY = "textColorKey";
-    private TextView mTextView;
+    private final String TEXT_VALUE_KEY = "textValueKey";
+    private final String TEXT_BG_COLOR_KEY = "textBgColorKey";
+    private TextView mColorDisplay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,16 +19,39 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         CustomColorPicker picker = (CustomColorPicker) findViewById(R.id.color_picker);
-        mTextView = (TextView) findViewById(R.id.hello_world);
+        mColorDisplay = (TextView) findViewById(R.id.color_display);
 
         if (savedInstanceState != null) {
-            mTextView.setTextColor(savedInstanceState.getInt(TEXT_COLOR_KEY));
+            mColorDisplay.setText(savedInstanceState.getCharSequence(TEXT_VALUE_KEY));
+            if (savedInstanceState.containsKey(TEXT_BG_COLOR_KEY)) {
+                mColorDisplay.setBackgroundColor(savedInstanceState.getInt(TEXT_BG_COLOR_KEY));
+            }
         }
 
         picker.setOnColorPickedListener(new OnColorPickedListener() {
             @Override
             public void onColorPicked(int color) {
-                mTextView.setTextColor(color);
+                mColorDisplay.setBackgroundColor(color);
+                StringBuilder sb = new StringBuilder();
+
+                int r = (color >> 16) & 0xFF;
+                int g = (color >> 8) & 0xFF;
+                int b = (color >> 0) & 0xFF;
+
+                sb.append("Red = ").append(r).append('\n');
+                sb.append("Green = ").append(g).append('\n');
+                sb.append("Blue = ").append(b).append('\n');
+
+                sb.append('\n');
+
+                float[] hsv = new float[3];
+                Color.colorToHSV(color, hsv);
+
+                sb.append("Hue = ").append(hsv[0]).append('\n');
+                sb.append("Saturation = ").append(hsv[1]).append('\n');
+                sb.append("Value = ").append(hsv[2]);
+
+                mColorDisplay.setText(sb.toString());
             }
         });
     }
@@ -33,6 +60,12 @@ public class MainActivity extends Activity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt(TEXT_COLOR_KEY, mTextView.getTextColors().getDefaultColor());
+        Drawable drawable = mColorDisplay.getBackground();
+        if (drawable instanceof ColorDrawable) {
+            ColorDrawable colorDrawable = (ColorDrawable) drawable;
+            outState.putInt(TEXT_BG_COLOR_KEY, colorDrawable.getColor());
+        }
+
+        outState.putCharSequence(TEXT_VALUE_KEY, mColorDisplay.getText());
     }
 }
