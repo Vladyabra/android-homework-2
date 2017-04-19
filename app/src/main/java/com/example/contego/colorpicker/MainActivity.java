@@ -9,8 +9,8 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-    private final String TEXT_VALUE_KEY = "textValueKey";
-    private final String TEXT_BG_COLOR_KEY = "textBgColorKey";
+    private final static String TEXT_VALUE_KEY = "textValueKey";
+    private final static String TEXT_BG_COLOR_KEY = "textBgColorKey";
     private TextView mColorDisplay;
 
     @Override
@@ -21,13 +21,6 @@ public class MainActivity extends Activity {
         CustomColorPicker picker = (CustomColorPicker) findViewById(R.id.color_picker);
         mColorDisplay = (TextView) findViewById(R.id.color_display);
 
-        if (savedInstanceState != null) {
-            mColorDisplay.setText(savedInstanceState.getCharSequence(TEXT_VALUE_KEY));
-            if (savedInstanceState.containsKey(TEXT_BG_COLOR_KEY)) {
-                mColorDisplay.setBackgroundColor(savedInstanceState.getInt(TEXT_BG_COLOR_KEY));
-            }
-        }
-
         picker.setOnColorPickedListener(new OnColorPickedListener() {
             @Override
             public void onColorPicked(int color) {
@@ -36,7 +29,7 @@ public class MainActivity extends Activity {
 
                 int r = (color >> 16) & 0xFF;
                 int g = (color >> 8) & 0xFF;
-                int b = (color >> 0) & 0xFF;
+                int b = color & 0xFF;
 
                 sb.append("Red = ").append(r).append('\n');
                 sb.append("Green = ").append(g).append('\n');
@@ -67,5 +60,17 @@ public class MainActivity extends Activity {
         }
 
         outState.putCharSequence(TEXT_VALUE_KEY, mColorDisplay.getText());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mColorDisplay.setText(savedInstanceState.getCharSequence(TEXT_VALUE_KEY));
+            if (savedInstanceState.containsKey(TEXT_BG_COLOR_KEY)) {
+                mColorDisplay.setBackgroundColor(savedInstanceState.getInt(TEXT_BG_COLOR_KEY));
+            }
+        }
     }
 }
